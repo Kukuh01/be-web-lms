@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'ninja',
     'django_seed',
+    'django_extensions',
 
     # My App
     'apps.accounts',
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     'apps.lessons',
     'apps.assignments',
     'apps.submissions',
+    'apps.user.dosen',
+    'apps.user.mahasiswa',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

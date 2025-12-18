@@ -3,5 +3,5 @@ from .models import Assignment
 
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('course', 'deadline')
+    list_display = ('course', 'title','deadline')
     list_filter = ('course',)

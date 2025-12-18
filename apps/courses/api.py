@@ -12,6 +12,7 @@ class CourseOut(Schema):
     id: int
     title: str
     description: str
+    instructor_id: int
 
 @router.post("/")
 def create_course(request, data: CourseIn):
