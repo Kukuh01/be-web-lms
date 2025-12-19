@@ -2,8 +2,9 @@ from ninja import Router, Schema
 from .models import Assignment
 from datetime import datetime
 from typing import List
+from core.jwt_auth import JWTAuth
 
-router = Router()
+router = Router(auth=JWTAuth(), tags=["Assignment"])
 
 class AssignmentIn(Schema):
     course_id: int

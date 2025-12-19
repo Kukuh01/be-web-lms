@@ -1,8 +1,9 @@
 from ninja import Router, Schema, File
 from ninja.files import UploadedFile
 from .models import Submission
+from core.jwt_auth import JWTAuth
 
-router = Router()
+router = Router(auth=JWTAuth(), tags=["Submission"])
 
 @router.post("/")
 def submit_assignment(

@@ -1,7 +1,8 @@
 from ninja import Router, Schema
 from .models import Course
+from core.jwt_auth import JWTAuth
 
-router = Router()
+router = Router(auth=JWTAuth(), tags=["Courses"])
 
 class CourseIn(Schema):
     title: str

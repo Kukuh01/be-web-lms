@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,6 +59,11 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
+
+# JWT Config
+JWT_SECRET = SECRET_KEY
+JWT_ALGORITHM = "HS256"
+JWT_ACCESS_TOKEN_EXPIRE = timedelta(minutes=60)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
