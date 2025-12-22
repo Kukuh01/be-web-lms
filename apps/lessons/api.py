@@ -2,6 +2,7 @@ from ninja import Router, Schema
 from .models import Lesson
 from typing import List
 from core.jwt_auth import JWTAuth
+from core.permissions import dosen_only
 
 router = Router(auth=JWTAuth(), tags=["Lessons"])
 
@@ -17,6 +18,7 @@ class LessonOut(Schema):
 
 @router.post("/")
 def create_lesson(request, data: LessonIn):
+    dosen_only(request)
     lesson = Lesson.objects.create(**data.dict())
     return {"id": lesson.id}
 

@@ -1,6 +1,7 @@
 from ninja import Router, Schema
 from .models import Course
 from core.jwt_auth import JWTAuth
+from core.permissions import dosen_only
 
 router = Router(auth=JWTAuth(), tags=["Courses"])
 
@@ -17,6 +18,7 @@ class CourseOut(Schema):
 
 @router.post("/")
 def create_course(request, data: CourseIn):
+    dosen_only(request)
     course = Course.objects.create(
         title=data.title,
         description=data.description,

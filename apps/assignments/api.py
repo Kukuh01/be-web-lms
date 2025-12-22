@@ -3,6 +3,7 @@ from .models import Assignment
 from datetime import datetime
 from typing import List
 from core.jwt_auth import JWTAuth
+from core.permissions import dosen_only
 
 router = Router(auth=JWTAuth(), tags=["Assignment"])
 
@@ -21,6 +22,7 @@ class AssignmentOut(Schema):
 
 @router.post("/")
 def create_assignment(request, data: AssignmentIn):
+    dosen_only(request)
     assignment = Assignment.objects.create(**data.dict())
     return {"id": assignment.id}
 
