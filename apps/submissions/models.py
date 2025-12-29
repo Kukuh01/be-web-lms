@@ -8,5 +8,6 @@ class Submission(models.Model):
         Mahasiswa,
         on_delete=models.CASCADE,
     )
+    lastModified = models.DateTimeField(null=True, blank=True)
     file = models.FileField(upload_to="submissions/")
     grade = models.FloatField(null=True, blank=True)

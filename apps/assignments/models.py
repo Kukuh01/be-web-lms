@@ -1,8 +1,8 @@
 from django.db import models
-from apps.courses.models import Course
+from apps.lessons.models import Lesson
 
 class Assignment(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     title = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     deadline = models.DateTimeField()

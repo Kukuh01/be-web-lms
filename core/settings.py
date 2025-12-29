@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'apps.submissions',
     'apps.user.dosen',
     'apps.user.mahasiswa',
+    'core',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
