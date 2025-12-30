@@ -17,4 +17,4 @@ def submit_assignment(
         student_id=student_id,
         file=file
     )
-    return {"id": submission.id}
+    return {"id": submission.id, "file_url": submission.file.url}

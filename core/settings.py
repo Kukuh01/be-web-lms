@@ -17,6 +17,8 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 load_dotenv(BASE_DIR / ".env")
 
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'ninja',
     'django_seed',
     'django_extensions',
+    "corsheaders",
 
     # My App
     'apps.accounts',
@@ -57,6 +60,7 @@ INSTALLED_APPS = [
     'apps.user.dosen',
     'apps.user.mahasiswa',
     'core',
+
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -67,6 +71,7 @@ JWT_ALGORITHM = "HS256"
 JWT_ACCESS_TOKEN_EXPIRE = timedelta(minutes=60)
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -76,6 +81,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+
+# CORS_ALLOW_HEADERS = [
+#     "authorization",
+#     "content-type",
+# ]
 
 ROOT_URLCONF = 'core.urls'
 
