@@ -9,14 +9,14 @@ class MahasiswaIn(Schema):
     user_id: int
     name: str
     nim: str
-    angkatan: str
+    angkatan: int
     program_studi: str
 
 class MahasiswaOut(Schema):
     id: int
     name: str
     nim: str
-    angkatan: str
+    angkatan: int
     program_studi: str
 
 @router.post("/")

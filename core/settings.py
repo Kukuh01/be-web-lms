@@ -68,7 +68,7 @@ AUTH_USER_MODEL = 'accounts.User'
 # JWT Config
 JWT_SECRET = SECRET_KEY
 JWT_ALGORITHM = "HS256"
-JWT_ACCESS_TOKEN_EXPIRE = timedelta(minutes=60)
+JWT_ACCESS_TOKEN_EXPIRE = timedelta(days=1)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

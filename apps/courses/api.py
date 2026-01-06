@@ -6,8 +6,8 @@ from apps.lessons.api import LessonOut
 from core.permissions import dosen_only
 from typing import Optional, List
 
-router = Router(tags=["Courses"])
-# router = Router(auth=JWTAuth(), tags=["Courses"])
+# router = Router(tags=["Courses"])
+router = Router(auth=JWTAuth(), tags=["Courses"])
 
 class InstructorOut(Schema):
     id: int

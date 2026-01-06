@@ -4,7 +4,7 @@ from typing import List, Optional
 from core.jwt_auth import JWTAuth
 from core.permissions import dosen_only
 
-router = Router(tags=["Lessons"])
+router = Router(auth=JWTAuth(),tags=["Lessons"])
 
 class LessonIn(Schema):
     course_id: int
