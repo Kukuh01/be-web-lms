@@ -6,8 +6,14 @@ from .auth import create_access_token
 from apps.user.mahasiswa.api import MahasiswaOut
 from apps.user.mahasiswa.models import Mahasiswa
 from core.jwt_auth import JWTAuth
+from typing import Union
 
 router = Router()
+
+class AdminOut(Schema):
+    name: str
+    email: str
+    role: str = "admin"
 
 # class UserOut(Schema):
 #     id: int
@@ -32,8 +38,19 @@ def login(request, data: LoginSchema):
     token = create_access_token(user)
     return {"access": token}
 
-@router.get("/me", response=MahasiswaOut, auth=JWTAuth())
+@router.get("/me", response={200: Union[MahasiswaOut, AdminOut]}, auth=JWTAuth())
 def get_me(request):
     user = request.auth
-    mahasiswa = Mahasiswa.objects.get(user=user)
-    return mahasiswa
+    
+    mahasiswa = Mahasiswa.objects.filter(user=user).first()
+    if mahasiswa:
+        return mahasiswa
+    
+    if user.is_staff or user.is_superuser:
+        return {
+            "name": user.username,
+            "email": user.email,
+            "role": "admin"
+        }
+    
+    return 404, {"detail": "Profile not found"}

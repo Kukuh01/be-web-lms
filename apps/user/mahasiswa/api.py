@@ -18,6 +18,11 @@ class MahasiswaOut(Schema):
     nim: str
     angkatan: int
     program_studi: str
+    role: str = None
+
+    @staticmethod
+    def resolve_role(obj):
+        return obj.user.role if hasattr(obj.user, 'role') else "mahasiswa"
 
 @router.post("/")
 def create_mahasiswa(request, data: MahasiswaIn):
