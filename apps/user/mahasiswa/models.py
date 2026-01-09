@@ -5,7 +5,8 @@ class Mahasiswa(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        limit_choices_to={'role': 'mahasiswa'}
+        limit_choices_to={'role': 'mahasiswa'},
+        null=True, blank=True
     )
     name = models.TextField(max_length=200, null=True, blank=True)
     nim = models.CharField(max_length=20, unique=True)

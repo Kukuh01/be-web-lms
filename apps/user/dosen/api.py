@@ -2,11 +2,12 @@ from ninja import Router, Schema
 from .models import Dosen
 from core.jwt_auth import JWTAuth
 from core.permissions import admin_only
+from typing import Optional
 
 router = Router(auth=JWTAuth(), tags=["Dosen"])
 
 class DosenIn(Schema):
-    user_id: int
+    user_id: Optional[int] = None
     name: str
     nidn: str
     fakultas: str
