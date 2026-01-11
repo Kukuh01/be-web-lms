@@ -18,6 +18,7 @@ class DosenOut(Schema):
     name: str
     nidn: str
     fakultas: str
+    role: str = "dosen"
 
 @router.get("/", response=list[DosenOut])
 def list_dosen(request):

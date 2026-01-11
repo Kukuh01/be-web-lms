@@ -20,7 +20,7 @@ class MahasiswaOut(Schema):
     nim: str
     angkatan: int
     program_studi: str
-    role: str = None
+    role: str = "mahasiswa"
 
     @staticmethod
     def resolve_role(obj):
