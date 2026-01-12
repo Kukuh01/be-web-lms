@@ -27,13 +27,8 @@ services:
     depends_on:
       - postgres
       - redis
-    environment:
-      - DEBUG=1
-      - DB_NAME=web_lms
-      - DB_USER=lms_user
-      - DB_PASSWORD=password123
-      - DB_HOST=postgres
-      - REDIS_HOST=redis
+    env_file:
+      - .env
 
 volumes:
   postgres_data:

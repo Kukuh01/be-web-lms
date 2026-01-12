@@ -15,7 +15,6 @@ db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
-.env
 
 # Database (PostgreSQL/Postgis)
 # Biasanya tidak ada file lokal, tapi jika ada dump:
