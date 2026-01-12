@@ -7,7 +7,9 @@ from .api import api
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
+    path('silk/', include('silk.urls', namespace='silk')),
 ]
+
 
 if settings.DEBUG:
     import debug_toolbar

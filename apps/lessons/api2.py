@@ -8,10 +8,8 @@ from django.db.models import Prefetch
 from .models import Course
 from core.permissions import dosen_or_admin_only
 from apps.assignments.api import AssignmentOut
-from .services import LessonService
 
 router = Router(auth=JWTAuth(),tags=["Lessons"])
-service = LessonService() # Inisialisasi Service
 
 class LessonIn(Schema):
     title: str
@@ -34,23 +32,38 @@ class LessonOut(Schema):
 
 @router.get("/course/{course_id}", response=List[LessonOut])
 def lessons_by_course(request, course_id: int):
-    # Logic pindah ke service (Redis + DB)
-    return service.get_lessons_by_course(course_id)
+    # Optimization: Prefetch berjenjang SANGAT PENTING di sini
+    # Course -> Lessons -> Assignment -> Submissions -> Student
+    return get_object_or_404(
+        Course.objects.prefetch_related(
+            "lessons",
+            "lessons__assignment_set", # Relasi reverse foreign key dari Assignment
+            "lessons__assignment_set__submission_set", # Relasi reverse dari Submission
+            "lessons__assignment_set__submission_set__student" # Relasi ke Mahasiswa
+        ), 
+        id=course_id
+    )
 
 @router.post("/{course_id}/lessons", response=LessonOut)
 def create_lesson(request, course_id: int, payload: LessonIn):
     dosen_or_admin_only(request)
-    # Panggil service create
-    return service.create_lesson(course_id, payload.dict())
+    course = get_object_or_404(Course, id=course_id)
+    lesson = Lesson.objects.create(course=course, **payload.dict())
+    return lesson
 
 @router.put("/{lesson_id}", response=LessonOut)
 def update_lesson(request, lesson_id: int, payload: LessonIn):
     dosen_or_admin_only(request)
-    # Panggil service update
-    return service.update_lesson(lesson_id, payload.dict())
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    for attr, value in payload.dict().items():
+        setattr(lesson, attr, value)
+    lesson.save()
+    return lesson
 
 @router.delete("/{lesson_id}")
 def delete_lesson(request, lesson_id: int):
     dosen_or_admin_only(request)
-    service.delete_lesson(lesson_id)
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    lesson.delete()
     return {"success": True}
+
