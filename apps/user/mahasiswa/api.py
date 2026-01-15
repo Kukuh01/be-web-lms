@@ -4,8 +4,10 @@ from core.jwt_auth import JWTAuth
 from core.permissions import admin_only
 from typing import Optional
 from django.shortcuts import get_object_or_404
+from .services import MahasiswaService
 
 router = Router(auth=JWTAuth(), tags=["Mahasiswa"])
+service = MahasiswaService()
 
 class MahasiswaIn(Schema):
     user_id: Optional[int] = None
@@ -25,7 +27,17 @@ class MahasiswaOut(Schema):
     @staticmethod
     def resolve_role(obj):
         return obj.user.role if hasattr(obj.user, 'role') else "mahasiswa"
-    
+
+class MahasiswaStatsOut(Schema):
+    total_mahasiswa: int
+
+@router.get("/stats", response=MahasiswaStatsOut)
+def get_mahasiswa_stats(request):
+    """
+    Mengambil jumlah total mahasiswa dari Cache Redis.
+    """
+    admin_only(request)
+    return service.get_mahasiswa_stats()
 
 @router.get("/", response=list[MahasiswaOut])
 def list_mahasiswa(request):
@@ -39,6 +51,7 @@ def create_mahasiswa(request, data: MahasiswaIn):
         payload.pop('user_id', None)
     try:
         mahasiswa = Mahasiswa.objects.create(**payload)
+        service.invalidate_stats()
         return {"id": mahasiswa.id, "message": "Mahasiswa berhasil dibuat"}
     except Exception as e:
         return {"error": str(e)}, 400
@@ -66,6 +79,7 @@ def delete_mahasiswa(request, mhs_id: int):
     try:
         mahasiswa = get_object_or_404(Mahasiswa, id=mhs_id)
         mahasiswa.delete()
+        service.invalidate_stats()
         return {"message": "Data mahasiswa berhasil dihapus"}
     except Exception as e:
         return {"error": str(e)}, 400

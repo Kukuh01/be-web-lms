@@ -6,8 +6,28 @@ from .models import Course
 class CourseService:
     # Definisi Key Cache
     KEY_LIST = "courses:all"
-    KEY_DETAIL = "course:{}"  # Format: course:1, course:2
-    TIMEOUT = 60 * 15  # 15 Menit
+    KEY_DETAIL = "course:{}"
+    KEY_STATS = "course:stats"
+    TIMEOUT = 60 * 60 
+
+    def get_course_stats(self):
+        # 1. Cek Redis
+        stats = cache.get(self.KEY_STATS)
+        if stats:
+            return stats
+
+        # 2. Hitung dari DB (Count Query)
+        total = Course.objects.count()
+        
+        # Bisa ditambahkan stats lain jika perlu, misal per instruktur
+        data = {
+            "total_courses": total
+        }
+
+        # 3. Simpan ke Redis
+        cache.set(self.KEY_STATS, data, self.TIMEOUT)
+        
+        return data
 
     def get_all_courses(self):
         # 1. Cek Redis
@@ -65,6 +85,7 @@ class CourseService:
         # INVALIDASI CACHE (Hapus cache lama)
         # Karena ada data baru, list courses yang di-cache sudah tidak valid
         cache.delete(self.KEY_LIST)
+        cache.delete(self.KEY_STATS)
         
         return course
 
@@ -98,3 +119,4 @@ class CourseService:
         # INVALIDASI CACHE
         cache.delete(self.KEY_LIST)
         cache.delete(self.KEY_DETAIL.format(course_id))
+        cache.delete(self.KEY_STATS)

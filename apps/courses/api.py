@@ -18,6 +18,9 @@ class InstructorOut(Schema):
     id: int
     name: str
 
+class CourseStatsOut(Schema):
+    total_courses: int
+
 class CourseIn(Schema):
     title: str
     description: str
@@ -38,10 +41,16 @@ class CourseDetail(CourseOut):
 
 # --- COURSE ENDPOINTS ---
 
+@router.get("/stats", response=CourseStatsOut)
+def get_course_stats(request):
+    """
+    Mengambil jumlah total kursus.
+    Data di-cache di Redis agar tidak membebani DB (Count Query).
+    """
+    return service.get_course_stats()
+
 @router.get("/", response=List[CourseOut])
 def list_courses(request):
-    # Logic pindah ke service. Service me-return List of Course Objects.
-    # Ninja akan otomatis mengubah Objects ini menjadi JSON sesuai Schema CourseOut.
     return service.get_all_courses()
 
 @router.get("/{course_id}", response=CourseDetail)
@@ -59,7 +68,6 @@ def create_course(
     thumbnail: UploadedFile = File(None),
 ):
     dosen_only(request)
-    # Bungkus data dalam dictionary agar rapi saat dikirim ke service
     payload = {
         "title": title,
         "description": description,
@@ -83,7 +91,6 @@ def update_course(
 ):
     dosen_or_admin_only(request)
     
-    # Pisahkan data text dan file
     payload = {
         "title": title,
         "description": description,
