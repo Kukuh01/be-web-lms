@@ -1,56 +1,34 @@
 from ninja import Router, Schema
-from .models import Lesson
-from typing import List, Optional
+from typing import List
 from core.jwt_auth import JWTAuth
-from core.permissions import dosen_only
-from django.shortcuts import get_object_or_404
-from django.db.models import Prefetch
-from .models import Course
 from core.permissions import dosen_or_admin_only
-from apps.assignments.api import AssignmentOut
 from .services import LessonService
+from .schemas import LessonIn, LessonOut
 
 router = Router(auth=JWTAuth(),tags=["Lessons"])
-service = LessonService() # Inisialisasi Service
-
-class LessonIn(Schema):
-    title: str
-    description: Optional[str] = None
-    content: str
-
-class LessonOut(Schema):
-    id: int
-    title: str
-    description: Optional[str] = None
-    content: str
-    assignment: Optional[AssignmentOut] = None
-    @staticmethod
-    def resolve_assignment(obj):
-        # Mengambil assignment pertama (karena logic 1 Lesson = 1 Assignment)
-        # Gunakan getattr untuk menghindari error jika assignment_set belum diprefetch
-        if hasattr(obj, 'assignment_set'):
-            return obj.assignment_set.first()
-        return None
+lesson_service = LessonService()
 
 @router.get("/course/{course_id}", response=List[LessonOut])
 def lessons_by_course(request, course_id: int):
-    # Logic pindah ke service (Redis + DB)
-    return service.get_lessons_by_course(course_id)
+    return lesson_service.get_lessons_by_course(course_id)
 
-@router.post("/{course_id}/lessons", response=LessonOut)
-def create_lesson(request, course_id: int, payload: LessonIn):
+@router.post("/{course_id}/lessons", response={201: LessonOut})
+def create_lesson(request, course_id: int, data: LessonIn):
     dosen_or_admin_only(request)
-    # Panggil service create
-    return service.create_lesson(course_id, payload.dict())
+    lesson = lesson_service.create_lesson(course_id, **data.dict())
+    return 201, lesson
 
-@router.put("/{lesson_id}", response=LessonOut)
-def update_lesson(request, lesson_id: int, payload: LessonIn):
+@router.put("/{lesson_id}", response={200: LessonOut})
+def update_lesson(request, lesson_id: int, data: LessonIn):
     dosen_or_admin_only(request)
-    # Panggil service update
-    return service.update_lesson(lesson_id, payload.dict())
+    lesson = lesson_service.update_lesson(lesson_id, **data.dict())
+    return 200, lesson
 
 @router.delete("/{lesson_id}")
 def delete_lesson(request, lesson_id: int):
     dosen_or_admin_only(request)
-    service.delete_lesson(lesson_id)
-    return {"success": True}
+    lesson_service.delete_lesson(lesson_id)
+    return 200, {
+        "success": True,
+        "message": "Lesson berhasil dihapus"
+    }

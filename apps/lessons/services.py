@@ -29,13 +29,7 @@ class LessonService:
             id=course_id
         )
 
-        # PENTING: Ubah jadi List. 
-        # Karena response API minta `List[LessonOut]`, kita ambil lessons-nya saja.
-        # Jika kita return object 'course', nanti schema validasinya bingung.
         lessons = list(course.lessons.all())
-
-        # 4. Simpan ke Redis
-        # Kita simpan LIST lessons, bukan object course
         cache.set(key, lessons, self.TIMEOUT)
         
         return lessons
@@ -44,7 +38,6 @@ class LessonService:
         course = get_object_or_404(Course, id=course_id)
         lesson = Lesson.objects.create(course=course, **data)
         
-        # INVALIDASI CACHE: Hapus cache list lessons di course ini
         cache.delete(self.CACHE_KEY_LIST.format(course_id))
         
         return lesson
@@ -56,19 +49,16 @@ class LessonService:
             setattr(lesson, attr, value)
         lesson.save()
 
-        # INVALIDASI CACHE
-        # Kita harus tahu lesson ini milik course ID berapa untuk hapus cache list-nya
         cache.delete(self.CACHE_KEY_LIST.format(lesson.course_id))
         
         return lesson
 
     def delete_lesson(self, lesson_id: int):
         lesson = get_object_or_404(Lesson, id=lesson_id)
-        course_id = lesson.course_id # Simpan ID sebelum dihapus
+        course_id = lesson.course_id
         
         lesson.delete()
 
-        # INVALIDASI CACHE
         cache.delete(self.CACHE_KEY_LIST.format(course_id))
         
         return True

@@ -82,8 +82,6 @@ class CourseService:
         # Create Data
         course = Course.objects.create(**data)
         
-        # INVALIDASI CACHE (Hapus cache lama)
-        # Karena ada data baru, list courses yang di-cache sudah tidak valid
         cache.delete(self.KEY_LIST)
         cache.delete(self.KEY_STATS)
         
@@ -103,11 +101,7 @@ class CourseService:
             course.thumbnail = file_data
 
         course.save()
-
-        # INVALIDASI CACHE
-        # Hapus cache LIST (karena judul/deskripsi di list mungkin berubah)
         cache.delete(self.KEY_LIST)
-        # Hapus cache DETAIL ID tersebut
         cache.delete(self.KEY_DETAIL.format(course_id))
 
         return course
