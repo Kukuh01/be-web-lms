@@ -93,6 +93,12 @@ docker compose exec web python manage.py createsuperuser
 
 ## 🔧 Development Notes
 
+### Redis Checking
+
+```bash
+docker exec -it core-redis-1 redis-cli
+```
+
 ### Fitur Development
 
 - **DEBUG=True** diperlukan untuk:

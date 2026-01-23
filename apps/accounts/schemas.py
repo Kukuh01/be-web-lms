@@ -1,4 +1,5 @@
 from ninja import Schema
+from typing import Optional
 
 class LoginSchema(Schema):
     username: str
@@ -6,3 +7,40 @@ class LoginSchema(Schema):
 
 class TokenSchema(Schema):
     access: str
+
+class ErrorSchema(Schema):
+    detail: str
+
+class AdminOut(Schema):
+    name: str
+    role: str = "admin"
+
+class UserRoleEnum(str, Enum):
+    admin = "admin"
+    dosen = "dosen"
+    mahasiswa = "mahasiswa"
+
+class UserCreateSchema(Schema):
+    username: str
+    password: str
+    role: UserRoleEnum
+    is_staff: bool = False
+
+class UserUpdateSchema(Schema):
+    username: Optional[str] = None
+    password: Optional[str] = None
+    role: Optional[UserRoleEnum] = None
+    is_active: Optional[bool] = None
+
+class UserOut(Schema):
+    id: int
+    username: str
+    role: str
+    is_active: bool
+    is_staff: bool
+
+class UserStatsOut(Schema):
+    total_users: int
+    total_user_mahasiswa: int
+    total_user_dosen: int
+    total_user_admin: int
