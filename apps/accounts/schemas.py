@@ -1,5 +1,25 @@
 from ninja import Schema
 from typing import Optional
+from enum import Enum
+
+class AdminOut(Schema):
+    name: str
+    role: str
+
+class DosenOut(Schema):
+    id: int
+    name: str
+    nidn: str
+    fakultas: str
+    role: str
+
+class MahasiswaOut(Schema):
+    id: int
+    name: str
+    nim: str
+    angkatan: int
+    program_studi: str
+    role: str
 
 class LoginSchema(Schema):
     username: str
@@ -10,6 +30,10 @@ class TokenSchema(Schema):
 
 class ErrorSchema(Schema):
     detail: str
+
+class SuccessSchema(Schema):
+    success: bool
+    message: str
 
 class AdminOut(Schema):
     name: str

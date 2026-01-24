@@ -3,7 +3,7 @@ version: "3.9"
 services:
   postgres:
     image: postgres:16
-    container_name: postgres_db
+    container_name: db_lms
     restart: always
     environment:
       POSTGRES_DB: web_lms
@@ -15,9 +15,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
+    container_name: redis_lms
     image: redis:7-alpine
 
   web:
+    container_name: web_lms
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:

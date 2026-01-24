@@ -1,35 +1,13 @@
-from ninja import Router, Schema
+from ninja import Router
 from .models import Mahasiswa
 from core.jwt_auth import JWTAuth
 from core.permissions import admin_only
-from typing import Optional
 from django.shortcuts import get_object_or_404
 from .services import MahasiswaService
+from .schemas import MahasiswaIn, MahasiswaOut, MahasiswaStatsOut
 
 router = Router(auth=JWTAuth(), tags=["Mahasiswa"])
-service = MahasiswaService()
-
-class MahasiswaIn(Schema):
-    user_id: Optional[int] = None
-    name: str
-    nim: str
-    angkatan: int
-    program_studi: str
-
-class MahasiswaOut(Schema):
-    id: int
-    name: str
-    nim: str
-    angkatan: int
-    program_studi: str
-    role: str = "mahasiswa"
-
-    @staticmethod
-    def resolve_role(obj):
-        return obj.user.role if hasattr(obj.user, 'role') else "mahasiswa"
-
-class MahasiswaStatsOut(Schema):
-    total_mahasiswa: int
+mahasiswa_service = MahasiswaService()
 
 @router.get("/stats", response=MahasiswaStatsOut)
 def get_mahasiswa_stats(request):
@@ -43,43 +21,23 @@ def get_mahasiswa_stats(request):
 def list_mahasiswa(request):
     return Mahasiswa.objects.all()
 
-@router.post("/")
+@router.post("/", response={200: MahasiswaOut})
 def create_mahasiswa(request, data: MahasiswaIn):
     admin_only(request)
-    payload = data.dict()
-    if not payload.get('user_id'):
-        payload.pop('user_id', None)
-    try:
-        mahasiswa = Mahasiswa.objects.create(**payload)
-        service.invalidate_stats()
-        return {"id": mahasiswa.id, "message": "Mahasiswa berhasil dibuat"}
-    except Exception as e:
-        return {"error": str(e)}, 400
+    mahasiswa = mahasiswa_service.create_mahasiswa(**data.dict())
+    return 201, mahasiswa
 
-@router.put("/{mhs_id}")
+@router.put("/{mhs_id}", response={200: MahasiswaIn})
 def update_mahasiswa(request, mhs_id: int, data: MahasiswaIn):
     admin_only(request)
-    mahasiswa = get_object_or_404(Mahasiswa, id=mhs_id)
+    mahasiswa = mahasiswa_service.update_mahasiswa(mhs_id, **data.dict())
+    return 200, mahasiswa
 
-    payload = data.dict()
-    if not payload.get('user_id'):
-          payload.pop('user_id', None)
-    try:
-        for attr, value in payload.items():
-            setattr(mahasiswa, attr, value)
-
-        mahasiswa.save()
-        return {"message": "Data mahasiswa berhasil diperbarui"}
-    except Exception as e:
-            return {"error": str(e)}, 400
-    
 @router.delete("/{mhs_id}")
 def delete_mahasiswa(request, mhs_id: int):
     admin_only(request)
-    try:
-        mahasiswa = get_object_or_404(Mahasiswa, id=mhs_id)
-        mahasiswa.delete()
-        service.invalidate_stats()
-        return {"message": "Data mahasiswa berhasil dihapus"}
-    except Exception as e:
-        return {"error": str(e)}, 400
+    mahasiswa_service.delete_mahasiswa(mhs_id)
+    return 200, {
+        "success": True,
+        "message": "Dosen berhasil dihapus"
+    }

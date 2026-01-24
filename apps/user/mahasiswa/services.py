@@ -1,6 +1,7 @@
 # apps/user/dosen/services.py
 from django.core.cache import cache
 from .models import Mahasiswa
+from django.shortcuts import get_object_or_404
 
 class MahasiswaService:
     KEY_STATS = "mahasiswa:stats"
@@ -24,3 +25,23 @@ class MahasiswaService:
     def invalidate_stats(self):
         """Hapus cache saat ada mahasiswa baru atau dihapus"""
         cache.delete(self.KEY_STATS)
+
+    def create_mahasiswa(self, **data):
+        mahasiswa = Mahasiswa.objects.create(**data)
+        return mahasiswa
+
+    def update_mahasiswa(request, dsn_id: int, **data):
+        mahasiswa = get_object_or_404(Mahasiswa, id=dsn_id)
+
+        for attr, value in data.items():
+            setattr(mahasiswa, attr, value)
+        mahasiswa.save()
+
+        return mahasiswa
+    
+    def delete_mahasiswa(self, dsn_id: int):
+        mahasiswa = get_object_or_404(Mahasiswa, id=dsn_id)
+        
+        mahasiswa.delete()
+        
+        return True

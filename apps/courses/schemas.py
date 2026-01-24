@@ -10,13 +10,11 @@ class CourseStatsOut(Schema):
     total_courses: int
 
 class CourseIn(Schema):
-    id: int
     title: str
     description: Optional[str]
     linkMeet: Optional[str] = None
     linkWa: Optional[str] = None
-    instructor: InstructorOut
-    thumbnail: Optional[str] = None
+    instructor_id: int
 
 class CourseOut(Schema):
     id: int

@@ -22,9 +22,9 @@ class LessonService:
         course = get_object_or_404(
             Course.objects.prefetch_related(
                 "lessons",
-                "lessons__assignment_set", 
-                "lessons__assignment_set__submission_set", 
-                "lessons__assignment_set__submission_set__student" 
+                "lessons__assignments_set", 
+                "lessons__assignments_set__submission_set", 
+                "lessons__assignments_set__submission_set__student" 
             ), 
             id=course_id
         )

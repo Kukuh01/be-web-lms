@@ -21,9 +21,9 @@ class Assignment(models.Model):
     """
 
     # Relasi ke model Lesson (satu lesson dapat memiliki banyak assignment)
-    lesson = models.ForeignKey(
+    lesson = models.OneToOneField(
         Lesson,
-        related_name="assignments",
+        related_name="assignment",
         on_delete=models.CASCADE
     )
 

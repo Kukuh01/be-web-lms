@@ -2,6 +2,7 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from .models import Course
+from apps.user.dosen.models import Dosen
 
 class CourseService:
     # Definisi Key Cache
@@ -40,9 +41,9 @@ class CourseService:
         queryset = Course.objects.select_related("instructor")\
             .prefetch_related(
                 "lessons", 
-                "lessons__assignment_set",
-                "lessons__assignment_set__submission_set",
-                "lessons__assignment_set__submission_set__student",
+                "lessons__assignment",
+                "lessons__assignment__submission_set",
+                "lessons__assignment__submission_set__student",
             ).all()
         
         # PENTING: Lakukan evaluasi queryset ke list agar data ter-fetch sekarang
@@ -66,9 +67,9 @@ class CourseService:
         course = get_object_or_404(
             Course.objects.prefetch_related(
                 "lessons",
-                "lessons__assignment_set",
-                "lessons__assignment_set__submission_set",
-                "lessons__assignment_set__submission_set__student"
+                "lessons__assignment",
+                "lessons__assignment__submission_set",
+                "lessons__assignment__submission_set__student"
             ), 
             id=course_id
         )
@@ -78,23 +79,27 @@ class CourseService:
         
         return course
 
-    def create_course(self, **data):
-        # Create Data
-        course = Course.objects.create(**data)
-        
+    def create_course(self, instructor_id, thumbnail=None, **data):
+        dosen = get_object_or_404(Dosen, id=instructor_id)
+        course = Course.objects.create(
+            instructor=dosen,
+            thumbnail=thumbnail,
+            **data
+        )
         cache.delete(self.KEY_LIST)
         cache.delete(self.KEY_STATS)
-        
         return course
 
-    def update_course(self, course_id, file_data=None, **data):
+    def update_course(self, course_id, file_data=None, instructor_id=None, **data):
         course = get_object_or_404(Course, id=course_id)
-        
-        # Update field text
+
+        if instructor_id:
+            dosen = get_object_or_404(Dosen, id=instructor_id)
+            course.instructor = dosen
+
         for key, value in data.items():
             setattr(course, key, value)
-        
-        # Update file (thumbnail) jika ada
+
         if file_data:
             if course.thumbnail:
                 course.thumbnail.delete(save=False)
@@ -103,7 +108,6 @@ class CourseService:
         course.save()
         cache.delete(self.KEY_LIST)
         cache.delete(self.KEY_DETAIL.format(course_id))
-
         return course
 
     def delete_course(self, course_id):

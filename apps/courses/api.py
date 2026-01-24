@@ -36,19 +36,25 @@ def create_course(
     thumbnail: UploadedFile = File(None),
 ):
     dosen_only(request)
-    course = course_service.create_course(**data.dict(), thumbnail=thumbnail)
+    course = course_service.create_course(
+        thumbnail=thumbnail,
+        **data.dict()
+    )
     return 201, course
 
 @router.put("/{course_id}", response={200: CourseOut})
 def update_course(
     request,
     course_id: int,
-    data: CourseIn = Form(...), #Form(...) digunakan jika json mengirimkan file
-    thumbnail: Optional[UploadedFile] = File(None),
+    data: CourseIn = Form(...),
+    thumbnail: UploadedFile = File(None),
 ):
     dosen_or_admin_only(request)
-    course = course_service.update_course(course_id, file_data=thumbnail, **data.dict())
-
+    course = course_service.update_course(
+        course_id,
+        thumbnail,
+        **data.dict()
+    )
     return 200, course
 
 @router.delete("/{course_id}")

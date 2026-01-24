@@ -1,12 +1,11 @@
-from typing import Union, List
+from typing import List, Union
 from ninja import Router
 from .models import User
-from .schemas import LoginSchema, TokenSchema
 from .auth import create_access_token
 from core.jwt_auth import JWTAuth
 from core.permissions import admin_only
-from apps.user.mahasiswa.api import MahasiswaOut
-from .schemas import LoginSchema, TokenSchema, ErrorSchema, UserCreateSchema, UserUpdateSchema, UserOut, UserStatsOut
+from apps.user.mahasiswa.api import MahasiswaOut, MahasiswaIn
+from .schemas import LoginSchema, TokenSchema, ErrorSchema, UserCreateSchema, UserUpdateSchema, UserOut, UserStatsOut, AdminOut, MahasiswaOut, DosenOut, SuccessSchema
 from .services import UserService
 
 router = Router(tags=["Accounts Management"])
@@ -22,10 +21,9 @@ def login(request, data: LoginSchema):
     token = create_access_token(user)
     return 200, {"access": token}
 
-
 @router.get(
     "/me",
-    response={200: MahasiswaOut, 404: ErrorSchema},
+    response={ 200: Union[MahasiswaOut, DosenOut, AdminOut], 404: ErrorSchema},
     auth=JWTAuth()
 )
 def get_me(request):
@@ -85,7 +83,7 @@ def update_user(request, user_id: int, data: UserUpdateSchema):
     user = user_service.update_user(user_id, data)
     return 200, user
 
-@router.delete("/{user_id}", response={ 400: ErrorSchema}, auth=JWTAuth())
+@router.delete("/{user_id}", response={ 400: ErrorSchema, 200: SuccessSchema}, auth=JWTAuth())
 def delete_user(request, user_id: int):
     """
     Menghapus User.
