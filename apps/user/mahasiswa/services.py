@@ -30,17 +30,17 @@ class MahasiswaService:
         mahasiswa = Mahasiswa.objects.create(**data)
         return mahasiswa
 
-    def update_mahasiswa(request, dsn_id: int, **data):
-        mahasiswa = get_object_or_404(Mahasiswa, id=dsn_id)
+    def update_mahasiswa(request, mhs_id: int, **data):
+        mahasiswa = get_object_or_404(Mahasiswa, id=mhs_id)
 
-        for attr, value in data.items():
-            setattr(mahasiswa, attr, value)
+        for field, value in data.items():
+            setattr(mahasiswa, field, value)
         mahasiswa.save()
 
         return mahasiswa
     
-    def delete_mahasiswa(self, dsn_id: int):
-        mahasiswa = get_object_or_404(Mahasiswa, id=dsn_id)
+    def delete_mahasiswa(self, mhs_id: int):
+        mahasiswa = get_object_or_404(Mahasiswa, id=mhs_id)
         
         mahasiswa.delete()
         

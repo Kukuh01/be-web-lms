@@ -1,8 +1,6 @@
 from ninja import Schema
-from typing import Optional
 
 class DosenIn(Schema):
-    user_id: Optional[int] = None
     name: str
     nidn: str
     fakultas: str
@@ -16,3 +14,7 @@ class DosenOut(Schema):
 
 class DosenStatsOut(Schema):
     total_dosen: int
+
+class SuccessSchema(Schema):
+    success: bool
+    message: str
