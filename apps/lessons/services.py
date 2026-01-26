@@ -22,9 +22,9 @@ class LessonService:
         course = get_object_or_404(
             Course.objects.prefetch_related(
                 "lessons",
-                "lessons__assignments_set", 
-                "lessons__assignments_set__submission_set", 
-                "lessons__assignments_set__submission_set__student" 
+                "lessons__assignment", 
+                "lessons__assignment__submission_set", 
+                "lessons__assignment__submission_set__student" 
             ), 
             id=course_id
         )
@@ -34,7 +34,7 @@ class LessonService:
         
         return lessons
 
-    def create_lesson(self, course_id: int, data: dict):
+    def create_lesson(self, course_id: int, **data):
         course = get_object_or_404(Course, id=course_id)
         lesson = Lesson.objects.create(course=course, **data)
         
@@ -42,11 +42,11 @@ class LessonService:
         
         return lesson
 
-    def update_lesson(self, lesson_id: int, data: dict):
+    def update_lesson(self, lesson_id: int, **data):
         lesson = get_object_or_404(Lesson, id=lesson_id)
         
-        for attr, value in data.items():
-            setattr(lesson, attr, value)
+        for field, value in data.items():
+            setattr(lesson, field, value)
         lesson.save()
 
         cache.delete(self.CACHE_KEY_LIST.format(lesson.course_id))

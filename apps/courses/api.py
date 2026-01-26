@@ -8,7 +8,7 @@ from .services import CourseService
 
 from core.jwt_auth import JWTAuth
 from core.permissions import dosen_only, dosen_or_admin_only
-from .schemas import CourseIn, CourseOut, CourseDetail, CourseStatsOut
+from .schemas import CourseIn, CourseOut, CourseDetail, CourseStatsOut, SuccessSchema
 
 router = Router(auth=JWTAuth(), tags=["Courses Management"])
 course_service = CourseService() 
@@ -57,7 +57,7 @@ def update_course(
     )
     return 200, course
 
-@router.delete("/{course_id}")
+@router.delete("/{course_id}", response={200: SuccessSchema})
 def delete_course(request, course_id: int):
     dosen_or_admin_only(request)
     course_service.delete_course(course_id)

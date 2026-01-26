@@ -14,3 +14,7 @@ class ErrorSchema(Schema):
 
 class GradeIn(Schema):
     grade: float
+
+class SuccessSchema(Schema):
+    success: bool
+    message: str

@@ -13,3 +13,7 @@ class LessonOut(Schema):
     description: Optional[str] = None
     content: str
     assignment: Optional[AssignmentOut] = None
+
+class SuccessSchema(Schema):
+    success: bool
+    message: str

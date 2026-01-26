@@ -10,17 +10,19 @@ class AssignmentService:
 
         return Assignment.objects.filter(lesson_id=lesson_id)
 
-    def create(self, lesson_id: int, data):
+    def create(self, lesson_id: int, **data):
         return Assignment.objects.create(
             lesson_id=lesson_id,
-            **data.dict()
+            **data
         )
 
-    def update(self, assignment_id: int, data):
+    def update(self, assignment_id: int, **data):
         assignment = get_object_or_404(Assignment, id=assignment_id)
-        for field, value in data.dict(exclude_unset=True).items():
+        
+        for field, value in data.items():
             setattr(assignment, field, value)
         assignment.save()
+
         return assignment
 
     def delete(self, assignment_id: int):

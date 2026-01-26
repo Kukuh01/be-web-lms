@@ -14,7 +14,7 @@ class CourseIn(Schema):
     description: Optional[str]
     linkMeet: Optional[str] = None
     linkWa: Optional[str] = None
-    instructor_id: int
+    instructor_id: int  
 
 class CourseOut(Schema):
     id: int
@@ -28,3 +28,7 @@ class CourseOut(Schema):
 
 class CourseDetail(CourseOut):
     lessons: List[LessonOut]
+
+class SuccessSchema(Schema):
+    success: bool
+    message: str

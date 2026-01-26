@@ -5,7 +5,7 @@ from typing import List
 from core.jwt_auth import JWTAuth
 from core.permissions import dosen_or_admin_only
 from .services import AssignmentService
-from .schemas import AssignmentOut, AssignmentIn
+from .schemas import AssignmentOut, AssignmentIn, SuccessSchema
 
 router = Router(auth=JWTAuth(), tags=["Assignment"])
 service = AssignmentService()
@@ -18,22 +18,22 @@ def list_assignments(request, lesson_id: int):
     "/lessons/{lesson_id}/assignments",
     response={201: AssignmentOut}
 )
-def create_assignment(request, lesson_id: int, payload: AssignmentIn):
+def create_assignment(request, lesson_id: int, data: AssignmentIn):
     dosen_or_admin_only(request)
-    assignment = service.create(lesson_id, payload)
+    assignment = service.create(lesson_id, **data.dict())
     return 201, assignment
 
 @router.put(
     "/assignments/{assignment_id}",
     response=AssignmentOut
 )
-def update_assignment(request, assignment_id: int, payload: AssignmentIn):
+def update_assignment(request, assignment_id: int, data: AssignmentIn):
     dosen_or_admin_only(request)
-    return service.update(assignment_id, payload)
+    return service.update(assignment_id, **data.dict(exclude_unset=True))
 
 @router.delete(
     "/assignments/{assignment_id}",
-    response={204: None}
+    response={200: SuccessSchema}
 )
 def delete_assignment(request, assignment_id: int):
     dosen_or_admin_only(request)

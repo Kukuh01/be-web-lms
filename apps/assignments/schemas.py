@@ -20,3 +20,7 @@ class AssignmentOut(Schema):
     def resolve_submissions(obj):
         # Mengambil semua submission terkait assignment ini
         return obj.submission_set.all()
+    
+class SuccessSchema(Schema):
+    success: bool
+    message: str
