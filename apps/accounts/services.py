@@ -41,20 +41,24 @@ class UserService:
             raise HttpError(401, "Invalid credentials")
         return user
     
-    def get_profile(self, user):
+    def get_profile(self, user: User):
         """
-        Ambil profile berdasarkan role user
+        Ambil profile berdasarkan role user (RBAC murni)
         """
-        mahasiswa = Mahasiswa.objects.filter(user=user).first()
-        if mahasiswa:
-            return "mahasiswa", mahasiswa
+        if user.role == User.Role.Mahasiswa:
+            profile = Mahasiswa.objects.filter(user=user).first()
+            if not profile:
+                raise HttpError(404, "Mahasiswa profile not found")
+            return user.role, profile
 
-        dosen = Dosen.objects.filter(user=user).first()
-        if dosen:
-            return "dosen", dosen
+        if user.role == User.Role.DOSEN:
+            profile = Dosen.objects.filter(user=user).first()
+            if not profile:
+                raise HttpError(404, "Dosen profile not found")
+            return user.role, profile
 
-        if user.is_staff or user.is_superuser:
-            return "admin", user
+        if user.role == User.Role.ADMIN:
+            return user.role, user
 
         raise HttpError(404, "Profile not found")
 

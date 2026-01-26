@@ -7,7 +7,7 @@ from typing import Optional, List
 from .services import CourseService
 
 from core.jwt_auth import JWTAuth
-from core.permissions import dosen_only, dosen_or_admin_only
+from core.permissions import dosen_or_admin_only
 from .schemas import CourseIn, CourseOut, CourseDetail, CourseStatsOut, SuccessSchema
 
 router = Router(auth=JWTAuth(), tags=["Courses Management"])
@@ -35,7 +35,7 @@ def create_course(
     data: CourseIn = Form(...),
     thumbnail: UploadedFile = File(None),
 ):
-    dosen_only(request)
+    dosen_or_admin_only(request)
     course = course_service.create_course(
         thumbnail=thumbnail,
         **data.dict()

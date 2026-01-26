@@ -10,7 +10,6 @@ class DosenOut(Schema):
     name: str
     nidn: str
     fakultas: str
-    role: str = "dosen"
 
 class DosenStatsOut(Schema):
     total_dosen: int

@@ -4,7 +4,6 @@ from .models import User
 from .auth import create_access_token
 from core.jwt_auth import JWTAuth
 from core.permissions import admin_only
-from apps.user.mahasiswa.api import MahasiswaOut, MahasiswaIn
 from .schemas import LoginSchema, TokenSchema, ErrorSchema, UserCreateSchema, UserUpdateSchema, UserOut, UserStatsOut, AdminOut, MahasiswaOut, DosenOut, SuccessSchema
 from .services import UserService
 
@@ -23,29 +22,22 @@ def login(request, data: LoginSchema):
 
 @router.get(
     "/me",
-    response={ 200: Union[MahasiswaOut, DosenOut, AdminOut], 404: ErrorSchema},
+    response=Union[MahasiswaOut, DosenOut, AdminOut],
     auth=JWTAuth()
 )
 def get_me(request):
     role, profile = user_service.get_profile(request.auth)
 
-    if role == "mahasiswa":
-        return 200, profile
+    if role == User.Role.Mahasiswa:
+        return MahasiswaOut.from_orm(profile)
 
-    if role == "dosen":
-        return 200, {
-            "id": profile.id,
-            "name": profile.name,
-            "nidn": profile.nidn,
-            "fakultas": profile.fakultas,
-            "role": "dosen"
-        }
+    if role == User.Role.DOSEN:
+        return DosenOut.from_orm(profile)
 
-    # admin
-    return 200, {
-        "name": profile.username,
-        "role": "admin"
-    }
+    return AdminOut(
+        name=profile.username,
+        role="admin"
+    )
 
 @router.get("/stats", response=UserStatsOut, auth=JWTAuth())
 def get_user_statistics(request):
@@ -61,7 +53,7 @@ def list_users(request):
     """
     List semua user untuk memudahkan Admin mencari ID saat mau create profil.
     """
-    admin_only(request) # Hanya admin yang boleh lihat
+    admin_only(request)
     return User.objects.all()
 
 @router.post("/", response={201: UserOut}, auth=JWTAuth())

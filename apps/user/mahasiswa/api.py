@@ -19,6 +19,7 @@ def get_mahasiswa_stats(request):
 
 @router.get("/", response=list[MahasiswaOut])
 def list_mahasiswa(request):
+    admin_only(request)
     return Mahasiswa.objects.all()
 
 @router.post("/", response={201: MahasiswaOut})

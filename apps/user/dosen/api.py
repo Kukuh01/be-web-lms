@@ -14,10 +14,12 @@ def get_dosen_stats(request):
     """
     Mengambil jumlah total dosen dari Cache Redis.
     """
+    admin_only()
     return dosen_service.get_dosen_stats()
 
 @router.get("/", response=list[DosenOut])
 def list_dosen(request):
+    admin_only(request)
     return Dosen.objects.all()
 
 @router.post("/", response={201: DosenOut})

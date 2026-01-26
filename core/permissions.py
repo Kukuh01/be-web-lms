@@ -11,7 +11,8 @@
 # Setiap fungsi akan memeriksa role user yang sedang login
 # dan mengembalikan status error 403 jika tidak memiliki izin.
 # =========================================================
-
+from ninja.errors import HttpError
+from apps.accounts.models import User
 
 def admin_only(request):
     """
@@ -24,8 +25,9 @@ def admin_only(request):
     Return:
     - (403, detail) jika user bukan admin
     """
-    if request.user.role != "admin":
-        return 403, {"detail": "Admin only"}
+    user = request.auth
+    if not user or user.role != User.Role.ADMIN:
+        raise HttpError(403, "Admin only")
 
 
 def dosen_only(request):
@@ -39,9 +41,9 @@ def dosen_only(request):
     Return:
     - (403, detail) jika user bukan dosen
     """
-    if request.user.role != "dosen":
-        return 403, {"detail": "Dosen only"}
-
+    user = request.auth
+    if not user or user.role != User.Role.DOSEN:
+        raise HttpError(403, "Dosen only")
 
 def mahasiswa_only(request):
     """
@@ -54,8 +56,9 @@ def mahasiswa_only(request):
     Return:
     - (403, detail) jika user bukan mahasiswa
     """
-    if request.user.role != "mahasiswa":
-        return 403, {"detail": "Mahasiswa only"}
+    user = request.auth
+    if not user or user.role != User.Role.Mahasiswa:
+        raise HttpError(403, "Mahasiswa only")
 
 
 def dosen_or_admin_only(request):
@@ -71,15 +74,9 @@ def dosen_or_admin_only(request):
       role yang sesuai
     - True jika user memiliki izin akses
     """
-    user = request.user
-
-    # Mengecek apakah user sudah login (terautentikasi)
-    if not user.is_authenticated:
-        return 403, {"detail": "Admin and Dosen only"}
-
-    # Mengecek apakah role user termasuk dosen atau admin
-    if user.role not in ["dosen", "admin"]:
-        return 403, {"detail": "Admin and Dosen only"}
-
-    # Akses diizinkan
-    return True
+    user = request.auth
+    if not user or user.role not in [
+        User.Role.ADMIN,
+        User.Role.DOSEN
+    ]:
+        raise HttpError(403, "Admin or Dosen only")

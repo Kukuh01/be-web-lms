@@ -11,7 +11,9 @@ class DosenOut(Schema):
     name: str
     nidn: str
     fakultas: str
-    role: str
+
+    class Config:
+        orm_mode = True
 
 class MahasiswaOut(Schema):
     id: int
@@ -19,7 +21,9 @@ class MahasiswaOut(Schema):
     nim: str
     angkatan: int
     program_studi: str
-    role: str
+
+    class Config:
+        orm_mode = True
 
 class LoginSchema(Schema):
     username: str
